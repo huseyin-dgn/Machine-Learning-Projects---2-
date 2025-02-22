@@ -1,0 +1,202 @@
+📊 Model Performans Karşılaştırması: KNN vs. Random Forest
+
+❌ KNN Neden İyi Sonuç Vermedi?
+K-En Yakın Komşular (KNN) algoritması non-parametrik ve tembel öğrenme yöntemi olduğu için, özellikle yüksek boyutlu ve karmaşık veri setlerinde iyi sonuç vermez.
+
+👉 KNN Model Skorları:
+🏆 R² (R-kare): 0.68 (Düşük, model yeterince açıklayıcı değil)
+📉 MAE: 3.1
+📊 RMSE: 5.
+
+📌 KNN'nin zayıf olmasının nedenleri:
+Çok değişkenli ve karmaşık veri setlerinde KNN, komşuluk tabanlı bir yöntem olduğu için yeterince genelleme yapamaz.
+Gürültüye duyarlıdır, özellikle düzensiz dağılıma sahip verilerde kötü performans gösterebilir.
+Parametre seçimine bağlıdır (k değeri), yanlış k seçimi kötü sonuç verebilir.
+
+✅ Random Forest Neden Daha İyi Çalıştı?
+Random Forest, birden fazla karar ağacını birleştirerek güçlü bir öğrenme modeli oluşturur. Veri içindeki farklı özellikleri değerlendirerek daha genelleştirilmiş tahminler yapar.
+
+👉 Random Forest Model Skorları:
+🏆 R² (R-kare): 0.89 (Modelin veriyi açıklama oranı oldukça yüksek!)
+📉 MAE: 2.04
+📊 RMSE: 2.99
+
+📌 Random Forest'in üstün olmasının nedenleri:
+✔ Özelliklerin önemini değerlendirir ve en iyi değişkenleri kullanır.
+✔ Aşırı öğrenmeyi (overfitting) önler çünkü bootstrap örnekleriyle çalışır.
+✔ Veri gürültüsüne karşı dayanıklıdır, çünkü birden fazla ağaç üzerinden karar verir.
+✔ Büyük veri setlerinde daha iyi performans gösterir, KNN gibi tüm veriyi hafızada tutmak zorunda değildir.
+
+🎯 Sonuç:
+📌 KNN yerine Random Forest kullanmak, karmaşık ve çok değişkenli veri setlerinde daha iyi tahmin yapmamızı sağladı.
+🔍 Daha düşük hata (MAE, RMSE) ve daha yüksek doğruluk (R²) elde ettik! 🚀
+
+
+📌 KOD AÇIKLAMALARI: KNN vs. Random Forest 📌
+Bu projede Boston Housing Data kullanarak ev fiyatlarını tahmin etmeye çalıştık. İki farklı model denedik:
+1️⃣ K-Nearest Neighbors (KNN) Regresyon
+2️⃣ Random Forest Regresyon
+
+Sonuç olarak Random Forest, KNN’den çok daha başarılı oldu. Şimdi kodları detaylıca açıklayalım.
+
+1️⃣ Veri Hazırlama
+
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+df = pd.read_csv("HousingData.csv")  # Veri setini okuma
+df.dropna(inplace=True)  # Eksik verileri temizleme
+
+📌 Ne yapıldı?
+Pandas ile veri okundu.
+dropna(inplace=True) ile eksik veriler temizlendi.
+
+2️⃣ KNN Modeli ile Tahmin
+Veri Setini Train-Test Olarak Ayırma
+
+from sklearn.model_selection import train_test_split
+X = df.drop("MEDV", axis=1)  # MEDV hedef değişken olduğu için çıkarıldı
+y = df["MEDV"]  # Hedef değişken
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42)
+
+📌 Ne yapıldı?
+Bağımsız değişkenler (X) ile bağımlı değişken (y) ayrıldı.
+train_test_split() ile verinin %33'ü test, %67'si eğitim olarak bölündü.
+Verileri Ölçeklendirme (StandardScaler)
+
+from sklearn.preprocessing import StandardScaler
+
+scaler = StandardScaler()
+scaler_X_train = scaler.fit_transform(X_train)  # Eğitim verisini fit et ve dönüştür
+scaler_X_test = scaler.transform(X_test)  # Test verisini aynı ölçekte dönüştür
+
+📌 Ne yapıldı?
+KNN ölçek duyarlı olduğu için veriler standartlaştırıldı (z-score normalization).
+KNN Modelini Eğitme ve Tahmin Yapma
+
+from sklearn.neighbors import KNeighborsRegressor
+from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
+
+knn = KNeighborsRegressor(n_neighbors=5)  # K=5 olarak seçildi
+knn.fit(scaler_X_train, y_train)  # Model eğitildi
+knn_pred = knn.predict(scaler_X_test)  # Test seti için tahmin yapıldı
+
+r2 = round(r2_score(y_test, knn_pred), 2)
+mae = round(mean_absolute_error(y_test, knn_pred), 2)
+rmse = round(np.sqrt(mean_squared_error(y_test, knn_pred)), 2)
+
+print("KNN Sonuçları:")
+print("R²:", r2)
+print("MAE:", mae)
+print("RMSE:", rmse)
+
+📌 Ne yapıldı?
+KNN modeli eğitildi ve test seti üzerinde tahmin yapıldı.
+Hata metrikleri hesaplandı:
+
+R² (Model doğruluğu)
+MAE (Mutlak hata)
+RMSE (Kök ortalama kare hata)
+En İyi K Değerini Belirleme (Hata Grafiği)
+
+hata_oranı = []
+
+for k in range(1, 40):
+    knn = KNeighborsRegressor(n_neighbors=k)
+    knn.fit(scaler_X_train, y_train)
+    knn_pred = knn.predict(scaler_X_test)
+
+    err = mean_absolute_error(y_test, knn_pred)
+    hata_oranı.append(err)
+
+plt.figure(figsize=(10,6), dpi=200)
+plt.plot(range(1, 40), hata_oranı, color="purple", linestyle="dashed",
+         marker="s", markerfacecolor="yellow", label='Test Error')
+plt.legend()
+plt.ylabel('Hata Oranı')
+plt.xlabel("K Değeri")
+plt.show()
+
+📌 Ne yapıldı?
+Farklı k değerleri için model eğitildi ve hata oranları (MAE) hesaplandı.
+Grafik çizilerek en iyi k değeri seçildi.
+
+3️⃣ Random Forest ile Tahmin
+Veriyi Tekrar Ayırma (Train-Test)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=9)
+
+📌 Ne yapıldı?
+Train-Test ayırma işlemi tekrar yapıldı, ancak bu kez test seti %30 olarak seçildi.
+
+Hyperparameter Tuning (GridSearchCV)
+
+from sklearn.model_selection import GridSearchCV
+from sklearn.ensemble import RandomForestRegressor
+
+n_est = [100,150,200,250,300]  # Ağaç sayıları
+bootstrap_sec = [True, False]  # Bootstrap örnekleme
+oob = [True, False]  # Out-of-bag değerlendirme
+
+parameters = {
+    "n_estimators": n_est,
+    "bootstrap": bootstrap_sec,
+    "oob_score": oob
+}
+
+random_forest = RandomForestRegressor()  # Regresyon modeli
+grid = GridSearchCV(random_forest, parameters, cv=5, scoring='neg_mean_squared_error')
+grid.fit(X_train, y_train)
+
+📌 Ne yapıldı?
+
+GridSearchCV kullanılarak en iyi hiperparametreler belirlendi:
+n_estimators: Kaç ağaç kullanılacağı
+bootstrap: Tüm verinin mi yoksa bir kısmının mı kullanılacağı
+oob_score: Out-of-bag değerlendirme
+
+Random Forest Modeli ile Tahmin ve Hata Metrikleri
+
+pred = grid.predict(X_test)
+
+mae = mean_absolute_error(y_test, pred)
+mse = mean_squared_error(y_test, pred)
+rmse = np.sqrt(mse)
+r2 = r2_score(y_test, pred)
+
+print("Random Forest Sonuçları:")
+print("Mean Absolute Error (MAE):", mae)
+print("Mean Squared Error (MSE):", mse)
+print("Root Mean Squared Error (RMSE):", rmse)
+print("R-squared (R²):", r2)
+
+📌 Ne yapıldı?
+
+Random Forest modeli eğitildi ve test seti üzerinde tahmin yapıldı.
+Hata metrikleri hesaplandı:
+MAE: 2.04
+MSE: 8.95
+RMSE: 2.99
+R²: 0.89 (Oldukça yüksek doğruluk)
+
+📊 Sonuçlar: KNN vs. Random Forest
+
+Model	    R² Skoru  MAE	RMSE
+KNN	        0.68	  3.1    5.39
+Random Forest	0.89	2.04	2.99
+
+✅ Random Forest, KNN’ye göre daha düşük hata verdi ve daha yüksek doğruluk sağladı.
+
+📌 SONUÇ 📌
+✔ KNN ölçeklendirme gerektiriyor ve parametreye (k) duyarlı.
+✔ Random Forest daha iyi genelleştirme yapıyor ve overfitting’i azaltıyor.
+✔ Bu yüzden Random Forest kullanımı daha iyi sonuç verdi. 🎯🚀
+
+
+
+
+
+
+

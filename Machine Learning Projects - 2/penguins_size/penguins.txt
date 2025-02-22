@@ -1,0 +1,107 @@
+                🌿 Penguen Türleri Sınıflandırması: Random Forest vs. Lojistik Regresyon
+
+    ✨  Veri Seti ve Amaç
+
+Palmer Penguenleri veri setini kullanarak penguen türlerini tahmin etmek için iki farklı makine öğrenmesi modelini karşılaştırdık:
+
+Random Forest Classifier
+
+Logistic Regression
+
+Amacımız, bu modellerin başarımını değerlendirerek hangi modelin daha iyi sınıflandırma yaptığını belirlemek.
+
+    ✨ Veri Hazırlama
+
+    📂 Veri Okuma ve Temizleme
+
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+df = pd.read_csv("penguins_size.csv")
+print(df.shape)
+print(df.isna().sum())  # Eksik verileri kontrol etme
+
+df = df.dropna()  # Eksik satırları temizleme
+print(df.shape)  # Temizlikten sonra veri boyutu
+
+    📊 Değişkenleri Hazırlama
+
+y = pd.get_dummies(df["species"])  # Hedef değişkeni one-hot encoding ile dönüştürme
+x = df.drop("species", axis=1)  # Bağımsız değişkenler
+x = pd.get_dummies(x, drop_first=True)  # Kategorik değişkenleri sayısala çevirme
+
+    🌟 Random Forest Modeli
+
+    ✨ Modeli Kurma ve İyileştirme
+
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import classification_report, confusion_matrix
+
+X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.3, random_state=9)
+
+random_forest = RandomForestClassifier(n_estimators=100, max_features=3, random_state=42)
+random_forest.fit(X_train, y_train)
+
+pred_rf = random_forest.predict(X_test)
+print("Random Forest Classification Report:\n", classification_report(y_test, pred_rf))
+
+    📈 Lojistik Regresyon Modeli
+
+    👉 Veriyi Standartlaştırma
+
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+
+scaler = StandardScaler()
+scaled_X_train = scaler.fit_transform(X_train)
+scaled_X_test = scaler.transform(X_test)
+
+    👉 Modeli Kurma
+
+log_model = LogisticRegression(max_iter=5000)
+log_model.fit(scaled_X_train, y_train.idxmax(axis=1))  # En yüksek değeri alarak 1D hale getiriyoruz
+
+pred_log = log_model.predict(scaled_X_test)
+print("Logistic Regression Classification Report:\n", classification_report(y_test.idxmax(axis=1), pred_log))
+
+    🔍 Confusion Matrisleri
+
+fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+
+# Random Forest Confusion Matrix
+
+rf_cm = confusion_matrix(y_test.idxmax(axis=1), pred_rf)
+sns.heatmap(rf_cm, annot=True, fmt="d", cmap="Blues", xticklabels=['Adelie', 'Chinstrap', 'Gentoo'], yticklabels=['Adelie', 'Chinstrap', 'Gentoo'], ax=axes[0])
+axes[0].set_title("Random Forest Confusion Matrix")
+
+# Logistic Regression Confusion Matrix
+
+log_cm = confusion_matrix(y_test.idxmax(axis=1), pred_log)
+sns.heatmap(log_cm, annot=True, fmt="d", cmap="Blues", xticklabels=['Adelie', 'Chinstrap', 'Gentoo'], yticklabels=['Adelie', 'Chinstrap', 'Gentoo'], ax=axes[1])
+axes[1].set_title("Logistic Regression Confusion Matrix")
+
+    📍 Sonuç ve Öneriler
+
+✅ Lojistik Regresyon, Random Forest'tan daha başarılı oldu!
+
+Lojistik Regresyon modeli %99 doğruluk oranına ulaştı ve sınıflandırma görevinde üstün performans gösterdi.
+
+Random Forest modeli de oldukça başarılıydı ve %98 doğruluk oranı elde etti.
+
+Hangi Durumda Hangi Model Seçilmeli?
+
+Daha hızlı ve yorumlanabilir bir model gerektiğinde: 🌟 Lojistik Regresyon önerilir.
+Daha karmaşık veri setlerinde ve özelliklerin önemli olduğu durumlarda: Random Forest tercih edilebilir.
+🎉 Lojistik Regresyon ile penguenleri başarıyla sınıflandırdık! 🚀
+
+
+
+
+
+
+
+
+

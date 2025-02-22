@@ -1,0 +1,38 @@
+🩺 Diabetes Sınıflandırma Analizi Özeti 🩺
+
+1. Veri Keşfi 🧑‍🔬:
+
+Diabetes Veriseti: Temel istatistikler ve eksik değerler df.describe() ve df.isna().sum() ile incelendi.
+
+Görselleştirmeler:
+
+Scatterplot: Glucose ile BMI arasındaki ilişkiyi ve Outcome ile olan bağlantıyı görselleştirdi.
+Pair Plot: Birden fazla özelliğin dağılımlarını ve Outcome ile ilişkilerini gösterdi.
+Isı Haritası: Özellikler arasındaki korelasyonu gösterdi, bu da çoklu doğrusal bağlantıları kontrol etmek için yararlı oldu.
+
+2. Veri Ön İşleme 🔧:
+
+Eğitim ve Test Verisi Ayırma: Veriler %70 eğitim, %30 test olarak bölündü.
+Standardizasyon: Modellerin özellikleri eşit şekilde tartılması için StandardScaler ile ölçeklendirildi.
+3. Kullanılan Modeller:
+
+Lojistik Regresyon (LogR) 🧳:
+
+GridSearchCV: C (ceza parametresi) ve solver (optimizasyon metodu) hiperparametreleri optimize edildi.
+Neden Kullanıldı: LogR, ikili sınıflandırma görevleri için iyi bir başlangıç modelidir.
+
+Karar Ağacı 🌳:
+
+Neden Kullanıldı: Karar ağaçları, verileri kategorik ve sayısal özelliklerle kolayca işleyebilir ve yorumlanabilir.
+Hiperparametre Ayarı yapılmadı, ancak yapılabilir.
+
+K-En Yakın Komşu (KNN) 🤝:
+
+GridSearchCV: n_neighbors, weights ve metric hiperparametreleri ile modelin optimizasyonu yapıldı.
+Neden Kullanıldı: KNN, basit ama güçlü bir model olup sınıflandırma için etkili olabilir. Veriye dayalı kararlar alır.
+
+Rastgele Orman (Random Forest) 🌲:
+
+GridSearchCV: n_estimators, max_features, bootstrap, ve oob_score gibi hiperparametrelerle model optimizasyonu yapıldı.
+Neden Kullanıldı: Ensemble (toplu) yöntemlerden biri olan Random Forest, güçlü tahminler yapabilme kapasitesine sahip ve overfitting (aşırı uyum) yapma olasılığı düşüktür.
+Sonuç: Her modelin belirli avantajları ve kullanıldığı durumlar vardır. Lojistik Regresyon başlangıç modeli, Karar Ağacı ve Random Forest daha karmaşık veriler için, KNN ise veri bağımlı kararlar için etkili olabilir.
