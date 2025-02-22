@@ -73,8 +73,6 @@ TAX 💰: Property tax rate.
 
 PTRATIO 👩‍🏫: Pupil-teacher ratio.
 
-B 👨‍👩‍👧: Proportion of Black population.
-
 LSTAT 💵: Proportion of lower status population.
 
 MEDV 💲: Median house value (in thousands of dollars).
